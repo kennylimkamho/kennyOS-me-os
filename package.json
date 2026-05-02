@@ -1,0 +1,16 @@
+{
+  "name": "me-os",
+  "version": "1.0.0",
+  "description": "KennyOS - Personal Knowledge Operating System",
+  "main": "src/cli/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/cli/index.ts",
+    "mcp": "bun run src/mcp-server/index.ts",
+    "web": "bun --hot src/web/index.ts",
+    "build": "bun build src/cli/index.ts --outdir=dist --target=bun"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

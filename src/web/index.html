@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KennyOS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: #1a1a1a;
+      border-right: 1px solid #333;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #6366f1;
+    }
+
+    .nav-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: background 0.2s;
+    }
+
+    .nav-item:hover {
+      background: #2a2a2a;
+    }
+
+    .nav-item.active {
+      background: #6366f1;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 20px;
+      max-width: 600px;
+    }
+
+    .message.user {
+      margin-left: auto;
+      background: #6366f1;
+      padding: 12px 16px;
+      border-radius: 16px 16px 4px 16px;
+    }
+
+    .message.ai {
+      background: #2a2a2a;
+      padding: 16px;
+      border-radius: 16px 16px 16px 4px;
+    }
+
+    .message .timestamp {
+      font-size: 12px;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    /* Input Area */
+    .input-area {
+      padding: 20px;
+      border-top: 1px solid #333;
+      background: #1a1a1a;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 12px;
+    }
+
+    input {
+      flex: 1;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    button {
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: none;
+      background: #6366f1;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5558e3;
+    }
+
+    /* Knowledge Panel */
+    .knowledge-panel {
+      width: 320px;
+      background: #1a1a1a;
+      border-left: 1px solid #333;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .knowledge-card {
+      background: #2a2a2a;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .knowledge-card h4 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .knowledge-card p {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Game State */
+    .game-state {
+      background: #2a2a2a;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .game-state h3 {
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .stat-bar {
+      height: 8px;
+      background: #444;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      border-radius: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Loading Animation */
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 16px;
+    }
+
+    .typing span {
+      width: 8px;
+      height: 8px;
+      background: #6366f1;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">🎮 KennyOS</div>
+
+    <div class="nav-item active">💬 Chat</div>
+    <div class="nav-item">📋 Decisions</div>
+    <div class="nav-item">👥 People</div>
+    <div class="nav-item">📄 Knowledge</div>
+    <div class="nav-item">📅 Journal</div>
+
+    <div class="game-state">
+      <h3>Level <span id="level">1</span> • <span id="xp">0</span> XP</h3>
+      <div class="stat-label">
+        <span>HP</span>
+        <span id="hp">100</span>/100
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar-fill" id="hp-bar" style="width: 100%"></div>
+      </div>
+      <div class="stat-label">
+        <span>MP</span>
+        <span id="mp">100</span>/100
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar-fill" id="mp-bar" style="width: 100%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="main">
+    <div class="chat-area" id="chat">
+      <div class="message ai">
+        <p>👋 你好！我是 KennyOS，你嘅 Personal AI Brain。</p>
+        <p class="timestamp">你可以問我關於你嘅 projects、decisions、people，或者任何你存储喺 knowledge base 入面嘅嘢。</p>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-container">
+        <input type="text" id="message-input" placeholder="問我任何嘢..." autocomplete="off">
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Knowledge Panel -->
+  <div class="knowledge-panel">
+    <div class="panel-title">📊 Quick Access</div>
+
+    <div id="recent-decisions">
+      <!-- Decisions will be loaded here -->
+    </div>
+
+    <div class="panel-title" style="margin-top: 24px">👥 Recent People</div>
+    <div id="recent-people">
+      <!-- People will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    const chatArea = document.getElementById('chat');
+    const input = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Add user message
+      addMessage('user', text);
+      input.value = '';
+
+      // Add typing indicator
+      const typing = document.createElement('div');
+      typing.className = 'message ai';
+      typing.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      chatArea.appendChild(typing);
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+        typing.remove();
+        addMessage('ai', data.response);
+      } catch (error) {
+        typing.remove();
+        addMessage('ai', '❌ Error: ' + error.message);
+      }
+    }
+
+    function addMessage(type, text) {
+      const msg = document.createElement('div');
+      msg.className = `message ${type}`;
+      msg.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p><span class="timestamp">${new Date().toLocaleTimeString()}</span>`;
+      chatArea.appendChild(msg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Load initial data
+    loadInitialData();
+
+    async function loadInitialData() {
+      // Fetch game state
+      try {
+        const stateRes = await fetch('/api/status');
+        const state = await stateRes.json();
+        document.getElementById('level').textContent = state.player_level;
+        document.getElementById('xp').textContent = state.total_xp;
+        document.getElementById('hp').textContent = state.hp;
+        document.getElementById('mp').textContent = state.mp;
+        document.getElementById('hp-bar').style.width = state.hp + '%';
+        document.getElementById('mp-bar').style.width = state.mp + '%';
+      } catch (e) {}
+
+      // Fetch recent decisions
+      try {
+        const decisionsRes = await fetch('/api/decisions');
+        const decisions = await decisionsRes.json();
+        document.getElementById('recent-decisions').innerHTML = decisions.slice(0, 3).map(d => `
+          <div class="knowledge-card">
+            <h4>${d.date}: ${d.topic}</h4>
+            <p>${d.decision.slice(0, 80)}...</p>
+          </div>
+        `).join('');
+      } catch (e) {}
+
+      // Fetch people
+      try {
+        const peopleRes = await fetch('/api/people');
+        const people = await peopleRes.json();
+        document.getElementById('recent-people').innerHTML = people.slice(0, 5).map(p => `
+          <div class="knowledge-card">
+            <h4>${p.name}</h4>
+            <p>${p.role || 'N/A'} @ ${p.company || 'N/A'} • Bond: ${p.bond_level}/10</p>
+          </div>
+        `).join('');
+      } catch (e) {}
+    }
+  </script>
+</body>
+</html>
